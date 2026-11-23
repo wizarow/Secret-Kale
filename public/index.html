@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Secret Kale</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06091f">
+<link rel="preload" href="fonts/big-shoulders-display.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Big Shoulders Display';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/big-shoulders-display.woff2) format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/hanken-grotesk.woff2) format('woff2')}
+:root{--n1:#10224F;--n2:#060C22;--blue:#2F6FED;--blue2:#5C93FF;--red:#E5384C;--red2:#FF6A7C;--bf:#2A66E0;--bd:#1F4FB8;--rf:#CF2D43;--rd:#B3213A;--gold:#F5C542;--ink:#EAF0FF;--mute:#9DB0E2;--panel:rgba(255,255,255,.06);--line:rgba(255,255,255,.17);--ok:#7FE3A2;--fs:16px;--disp:'Big Shoulders Display','Arial Narrow','Helvetica Neue',sans-serif;--body:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:var(--fs);background:var(--n2)}
+body{margin:0;min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,var(--n1) 0,var(--n2) 100%) fixed;color:var(--ink);font-family:var(--body);font-weight:500;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button,input,select{font:inherit;color:inherit;touch-action:manipulation}
+button{cursor:pointer;border-radius:0}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+::selection{background:var(--gold);color:var(--n2)}
+input{caret-color:var(--gold)}
+.sheet,.chatl{scrollbar-color:rgba(157,176,226,.5) transparent;scrollbar-width:thin}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;display:block;margin:auto}
+h1,h2,h3,p{margin:0}
+.bs{font-family:var(--disp);font-weight:900;text-transform:uppercase;letter-spacing:.02em}
+#app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:rgba(6,12,34,.4)}
+/* chyron */
+.chy{display:flex;align-items:center;gap:10px;min-height:52px;padding:calc(6px + env(safe-area-inset-top)) 16px 6px;background:var(--n2);border-bottom:3px solid var(--gold);font-size:1.25rem}
+.live{display:flex;align-items:center;gap:7px;background:var(--rf);color:#fff;padding:2px 10px;line-height:1.3;font-size:1.05rem;white-space:nowrap}
+.live::before{content:"";width:9px;height:9px;border-radius:50%;background:#fff}
+.chy h1,.chy .hh{font-size:1.85rem;line-height:1;flex:1;white-space:nowrap;font-weight:900}
+.chy .rd{color:var(--mute);font-size:1.15rem;white-space:nowrap}
+.cd{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}.cd.wait{background:var(--gold)}.cd.off{background:var(--red)}
+.util{display:flex;border-bottom:1px solid var(--line)}
+.util button{flex:1;height:46px;background:none;border:0;border-right:1px solid var(--line);font-family:var(--disp);font-weight:900;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.util button:last-child{border:0}
+.util b{background:var(--rf);color:#fff;font:700 .7rem var(--body);border-radius:9px;padding:1px 6px;margin-left:5px}
+.main{flex:1;padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px}
+/* race board */
+.board{border:1px solid var(--line);background:var(--panel);padding:10px 14px 8px}
+.race+.race{margin-top:8px}
+.race .h{display:flex;justify-content:space-between;align-items:baseline;font-size:1.2rem;gap:8px}
+.race .h small{font:700 .72rem var(--body);letter-spacing:.1em;color:var(--ink);margin-left:8px;vertical-align:middle}
+.race .h b{font-size:1.65rem;line-height:1}
+.race.d .h b{color:var(--blue2)}.race.r .h b{color:var(--red2)}
+.segs{display:flex;gap:5px;margin-top:4px}
+.sg{flex:1;min-width:0;text-align:center}
+.sg i{display:flex;align-items:center;justify-content:center;height:22px;background:rgba(255,255,255,.1);font:900 .95rem var(--disp);font-style:normal;color:#fff}
+.d .sg i.f{background:linear-gradient(180deg,var(--bf),var(--bd))}.r .sg i.f{background:linear-gradient(180deg,var(--rf),var(--rd))}
+.sg span{display:block;margin-top:2px;min-height:.9em;font:700 .7rem/1.05 var(--body);letter-spacing:0;color:var(--mute);text-transform:uppercase}
+.trk{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:1.1rem}
+.trk .l{display:flex;align-items:center;gap:10px}
+.lamps{display:flex;gap:8px}.lamps s{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold)}.lamps s.f{background:var(--gold)}
+.trk b{font-size:1.5rem;color:var(--gold);line-height:1}
+.trk .r2{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.trk em{font:500 .78rem var(--body);font-style:normal;color:var(--mute);text-transform:none;letter-spacing:0;text-align:right}
+/* the call */
+.call{position:relative;background:var(--gold);color:var(--n2);padding:12px 16px 14px;min-height:96px}
+.call .big{font-size:3rem;line-height:.95;overflow-wrap:break-word;padding-right:4.5rem}
+.call p{font:700 .92rem/1.35 var(--body);margin-top:6px}
+.call .fig{position:absolute;right:16px;top:12px;text-align:right;font-size:2.4rem;line-height:1}
+.call .fig small{display:block;font:700 .66rem var(--body);letter-spacing:.1em;text-transform:uppercase}
+.call.pd{background:linear-gradient(180deg,var(--bf),var(--bd));color:#fff}
+.call.pr{background:linear-gradient(180deg,var(--rf),var(--rd));color:#fff}
+.call.quiet{background:rgba(245,197,66,.12);color:var(--ink);border:1px solid rgba(245,197,66,.55)}
+.cmp .board .sg span{display:none}
+.cmp .race+.race{margin-top:6px}
+.cmp .call .big{font-size:2.2rem;padding-right:6.4rem}
+.cmp .call{min-height:0}
+.cmp .rw{min-height:42px}
+.stamp{animation:stamp .38s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes stamp{from{transform:scale(1.7) rotate(-5deg);opacity:0}to{transform:none;opacity:1}}
+.sg i.new{transform-origin:left;animation:fillx .6s .1s both ease-out}
+@keyframes fillx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.vc.fresh{animation:flip .36s both}
+@keyframes flip{from{transform:rotateX(90deg);opacity:0}to{transform:none;opacity:1}}
+/* bills */
+.bills{display:flex;gap:10px;margin-top:12px}
+.bill{flex:1;max-width:116px;height:112px;border:3px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--disp);font-weight:900;text-transform:uppercase;padding:0;position:relative}
+.bill b{font-size:3.2rem;line-height:.9}.bill span{font-size:.95rem;letter-spacing:.06em}
+.bill.d{background:linear-gradient(180deg,var(--bf),var(--bd))}.bill.r{background:linear-gradient(180deg,var(--rf),var(--rd))}
+.call .bill{border-color:rgba(6,12,34,.5)}
+button.bill.sel{border-color:#fff;transform:translateY(-6px);box-shadow:0 12px 20px rgba(0,0,0,.4)}
+.bill i{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);background:var(--n2);color:#fff;font:800 .72rem var(--body);letter-spacing:.1em;padding:3px 7px;white-space:nowrap}
+/* players */
+.tbl{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.tbl li{margin:0}
+.rw{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:6px 8px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;font-weight:700;font-size:1rem;color:var(--ink)}
+.rw .sn{flex:none;width:1.1rem;font:900 1rem var(--disp);color:var(--mute)}
+.rw .nm{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rw .tgs{flex:1;display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+.rw .st{flex:none;font:700 .75rem var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-align:right}
+button.rw{cursor:pointer}button.rw:hover{background:var(--panel)}
+.rw.sel,button.rw.sel:hover{background:rgba(245,197,66,.17);outline:2px solid #fff;outline-offset:-2px}
+.rw.me{background:rgba(47,111,237,.2)}
+.rw.dead{opacity:.45}.rw.dead .nm{text-decoration:line-through}
+.t{font:800 .7rem var(--body);letter-spacing:.06em;padding:2px 5px;border-radius:2px;text-transform:uppercase;background:rgba(255,255,255,.14);color:var(--ink);white-space:nowrap}
+.t.g{background:#fff;color:var(--n2)}.t.d{background:var(--bf)}.t.r{background:var(--rf)}.t.m{background:none;border:1px solid var(--line);color:var(--mute)}
+.vc{display:inline-block;font:900 1.05rem var(--disp);letter-spacing:.04em;padding:2px 10px;text-transform:uppercase}
+.vc.y{background:#fff;color:var(--n2)}.vc.n{border:2px solid #fff;padding:0 8px;color:#fff}
+.vc.in{color:var(--ok);font-size:.8rem;letter-spacing:.1em;font-family:var(--body);font-weight:800}
+.hd{display:flex;justify-content:space-between;font:700 .75rem var(--body);letter-spacing:.14em;color:var(--mute);text-transform:uppercase;padding:0 8px 6px}
+/* dock */
+.dock{position:sticky;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--n2);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;z-index:5}
+.drow{display:flex;gap:14px}
+.go,.gh{flex:none;width:100%;min-width:0;height:60px;border:3px solid var(--ink);font-family:var(--disp);font-weight:900;font-size:1.9rem;text-transform:uppercase;letter-spacing:.03em;background:transparent;color:var(--ink);padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drow .go,.drow .gh{flex:1;width:auto}
+.go{background:var(--gold);border-color:var(--gold);color:var(--n2)}
+.go.y{background:#fff;border-color:#fff}
+.go.arm{background:var(--red);border-color:var(--red);color:#fff}
+.gh.sm{height:46px;font-size:1.3rem;border-width:2px}
+.go[disabled],.gh[disabled]{opacity:.35;cursor:default}
+.go:active:not([disabled]),.gh:active:not([disabled]){transform:translateY(1px)}
+.go:hover:not([disabled]):not(.y):not(.arm){filter:brightness(1.07)}.gh:hover:not([disabled]),.chip:hover,.x:hover{background:rgba(255,255,255,.1)}
+.tick{display:flex;align-items:center;gap:8px;font:700 .9rem/1.3 var(--body);color:var(--ink);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.tick b{background:#fff;color:var(--n2);padding:0 8px;font-size:1rem;line-height:1.4}
+.tick span:first-of-type{flex:1;min-width:0}
+.note{text-align:center;font:500 .88rem/1.4 var(--body);color:var(--mute);min-height:1.2em}
+.err{color:var(--red2);font:700 .9rem var(--body)}.err:empty{display:none}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;text-underline-offset:4px;min-height:44px;padding:0 8px;font:500 .9rem var(--body)}
+/* home */
+.ttl{line-height:.82;margin:6px 0 0;font-weight:900}
+.ttl span{display:block;font-size:3.6rem;color:#9CB4F2;margin-bottom:10px}
+.ttl b{display:block;font-size:min(10.5rem,38vw);font-weight:900;color:#fff;letter-spacing:0}
+.rule{width:96px;height:8px;background:#9CB4F2}
+.tote{position:relative;display:flex;min-height:84px}
+.tote div{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 14px;font-size:1.9rem;line-height:1}
+.tote b{font-size:3.2rem;line-height:.95}
+.tote .d{background:linear-gradient(180deg,var(--bf),var(--bd))}.tote .r{background:linear-gradient(180deg,var(--rf),var(--rd));text-align:right}
+.tote i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;background:var(--gold);color:var(--n2);font:900 2.5rem/52px var(--disp);text-align:center;font-style:normal;border:4px solid var(--n2)}
+.say{font-size:1.3rem;color:var(--ink)}
+.fld{display:block;border:1px solid var(--line);background:rgba(255,255,255,.06);padding:8px 14px 6px}
+.fld small{display:block;font:700 .75rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.fld input{display:block;width:100%;height:34px;border:0;background:transparent;font:700 1.25rem var(--body);outline:none;padding:0}
+.fld:focus-within{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
+.fld input::placeholder{color:#6F82B8}
+.jrow{display:flex;gap:10px;align-items:stretch}
+.jrow .fld{flex:1;min-width:0}
+.jrow .fld input{text-transform:uppercase;letter-spacing:.35em;font-size:1.4rem}
+.jrow .gh{flex:0 0 110px;width:auto;height:auto;min-height:60px}
+.ver{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:2px;font:500 .78rem/1.5 var(--body);color:var(--mute);padding-top:6px;text-align:center}
+.bar{display:flex;align-items:center;gap:8px}
+/* lobby */
+.room{background:var(--gold);color:var(--n2);padding:12px 16px 14px}
+.room p{font:700 .9rem/1.35 var(--body);margin-top:4px}
+.room .code{font-size:4.6rem;line-height:.95;letter-spacing:.12em}
+.room .gh{height:44px;font-size:1.25rem;border-color:var(--n2);color:var(--n2);margin-top:8px;width:100%;flex:none}
+.rvh{font-size:3rem;line-height:.95;margin:2px 0 0}
+.rvp{font:500 .95rem/1.45 var(--body);color:var(--mute)}
+.sec{font:700 .75rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:2px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border:2px solid var(--line);background:transparent;font:800 1rem var(--body)}
+.chip.on{border-color:#fff;background:rgba(255,255,255,.16);color:#fff}
+.step{display:flex;align-items:center;gap:12px}.step b{font-size:2.2rem;min-width:2ch;text-align:center;line-height:1}
+.step .chip{width:48px;padding:0;color:var(--ink)}
+.set{display:flex;flex-direction:column;gap:14px;border:1px solid var(--line);background:var(--panel);padding:12px 14px}
+/* sheets */
+#modal{position:fixed;inset:0;display:none;z-index:20}
+#modal.on{display:flex;align-items:flex-end;justify-content:center;background:rgba(3,6,18,.72)}
+.sheet{width:100%;max-width:480px;max-height:88vh;max-height:88dvh;overflow:auto;background:var(--n1);border-top:3px solid var(--gold);padding:14px 16px calc(18px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.85,.25,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sheet h2{font-size:2rem;line-height:1}
+.x{width:44px;height:44px;border:2px solid var(--line);background:none;color:var(--ink);padding:0}
+.sheet p{font:500 .95rem/1.5 var(--body);color:var(--ink);margin:0 0 10px}
+.sheet ul.r{margin:0 0 10px;padding-left:1.1rem;font-size:.95rem;line-height:1.5}.sheet ul.r li{margin-bottom:6px}
+.rolebox{padding:16px;color:#fff;margin:6px 0 12px}
+.rolebox.d{background:linear-gradient(180deg,var(--bf),var(--bd))}.rolebox.r{background:linear-gradient(180deg,var(--rf),var(--rd))}
+.rolebox.hid{background:rgba(255,255,255,.08);border:2px dashed var(--line);color:var(--mute);text-align:center;font-size:1.8rem}
+.rolebox .big{font-size:3rem;line-height:.95}
+.en{list-style:none;border-bottom:1px solid var(--line);padding:10px 0;font:500 .9rem/1.45 var(--body)}
+.en b.n{font-family:var(--disp);font-size:1.3rem;color:var(--mute);margin-right:6px}
+.en .m{color:var(--mute);font-size:.82rem}
+.cl{display:inline-block;width:1.4em;text-align:center;font:900 .9rem var(--disp);color:#fff;margin-right:2px}.cl.d{background:var(--bf)}.cl.r{background:var(--rf)}
+.chatl{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin-bottom:10px}
+.cm{font:500 .95rem/1.4 var(--body);overflow-wrap:anywhere}.cm b{color:#fff}.cm.sys{color:var(--mute);font-size:.85rem}
+.cin{display:flex;gap:8px}.cin input{flex:1;min-width:0;height:48px;border:2px solid var(--line);background:rgba(255,255,255,.06);padding:0 12px;font:500 1rem var(--body);outline:none}
+.cin input:focus{border-color:#fff}.cin .go{flex:0 0 90px;width:auto;height:48px;font-size:1.3rem}
+#toast{position:fixed;left:0;right:0;bottom:calc(96px + env(safe-area-inset-bottom));display:flex;justify-content:center;pointer-events:none;z-index:30}
+.toast{background:#fff;color:var(--n2);font:700 .95rem var(--body);padding:10px 16px;max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<div id="modal"></div>
+<script src="engine.js"></script>
+<script>
+(function(){
+'use strict';
+var E=window.KEngine;
+var DEMO=!!window.__DEMO;
+var VER='v1 · Ishan Atul’s render';
+var FSIZES=[['Normal',16],['Large',18],['Larger',20]];
+var TIMERS=[0,30,45,60,120];
+var LEVELS=[['easy','Easy'],['medium','Medium'],['hard','Hard']];
+var POW={inv:'Probe',peek:'Peek',special:'Special',exec:'Execute'};
+var POWTXT={inv:'Investigate',peek:'Policy peek',special:'Special election',exec:'Execution'};
+var IC_X='<svg class="ic" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4l14 14M18 4L4 18"/></svg>',IC_PLUS='<svg class="ic" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14M11 4v14"/></svg>',IC_MINUS='<svg class="ic" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 11h14"/></svg>';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function load(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function timerLabel(t){return !t?'Off':t<60?t+' s':(t/60)+' min'}
+function tallyTag(p){return p.tally&&p.tally.games?'<span class="t m">'+p.tally.wins+' of '+p.tally.games+' won</span>':''}
+function plural(n,w){return n+' '+w+(n===1?'':'s')}
+
+var ui=Object.assign({fs:0},load('sk_ui',{}));
+var snap=null,me=null,game=null,es=null,sess=load('sk_sess',null),isLocal=false;
+var modal=null,errMsg='',selPid=null,selCard=null,armed=false,roleShow=false,roleSeen=false,roleKey='',stepKey='',turnDeadline=null,chatSeen=0;
+var hName=load('sk_name',''),hCode='',busy=false;
+try{var qr=new URLSearchParams(location.search).get('r');if(qr)hCode=qr.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4)}catch(e){}
+
+function applyUI(){
+  if(!FSIZES[ui.fs])ui.fs=0;
+  document.documentElement.style.setProperty('--fs',FSIZES[ui.fs][1]+'px');
+  save('sk_ui',{fs:ui.fs});
+}
+function toast(t){var el=$('#toast');el.innerHTML='<div class="toast">'+esc(t)+'</div>';clearTimeout(toast.t);toast.t=setTimeout(function(){el.innerHTML=''},2600)}
+var animT={},scrolled={};
+function fresh(k){if(!(k in animT))animT[k]=Date.now();return Date.now()-animT[k]<1600}
+function fdel(k,base){return ((base||0)-(Date.now()-animT[k])/1000).toFixed(2)+'s'}
+
+/* ---------- transport (same connection handling as Judgement and Asshole) ---------- */
+function api(path,body){return fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+var seq=-1,lastSse=0,conn='ok',failN=0,pollT=null,rtt=null,syncing=false,lastTry=0;
+function connText(){
+  if(conn==='off')return 'Offline. Waiting for the network…';
+  if(conn==='wait')return 'Reconnecting…';
+  return 'Connected'+(rtt!=null?' · '+rtt+' ms'+(rtt>800?' (slow)':''):'');
+}
+function paintConn(){
+  var d=$('#cd'),c=$('#connst');
+  if(d){d.className='cd '+conn;d.title=connText()}
+  if(c)c.textContent=connText();
+}
+function setConn(v){if(conn!==v){conn=v;paintConn()}}
+function pingNow(){
+  if(isLocal||DEMO||!sess)return;
+  var t0=performance.now();
+  fetch('/api/ping',{cache:'no-store'}).then(function(r){return r.json()}).then(function(){rtt=Math.round(performance.now()-t0);paintConn()}).catch(function(){});
+}
+setInterval(function(){if(modal==='menu')pingNow()},5000);
+function onSnap(s){
+  if(!isLocal&&!sess)return;
+  if(!isLocal&&s.seq!=null&&s.seq<=seq)return;
+  if(s.seq!=null)seq=s.seq;
+  var sk=s.phase+'|'+s.round+'|'+s.power+'|'+s.powerStage;
+  if(sk!==stepKey){stepKey=sk;selPid=null;selCard=null;armed=false}
+  turnDeadline=s.turnLeft==null?null:Date.now()+s.turnLeft;
+  snap=s;
+  var gk=s.phase==='lobby'?'':s.code+':'+s.players.map(function(p){return p.id}).join(',')+s.majParty;
+  if(gk&&gk!==roleKey){roleKey=gk;roleShow=false;roleSeen=false}
+  if(!gk)roleKey='';
+  render();
+  if(modal==='chat')paintChat();
+  else if(modal==='rec'||modal==='role')openModal(modal,true);
+}
+function roomGone(){
+  if(es){es.close();es=null}
+  stopPoll();sess=null;save('sk_sess',null);snap=null;seq=-1;selPid=selCard=null;
+  closeModal();toast('That table is no longer available');render();
+}
+function resync(){
+  if(!sess||isLocal||syncing)return;
+  syncing=true;
+  fetch('/api/state?code='+sess.code+'&token='+sess.token,{cache:'no-store'})
+    .then(function(r){return r.json().then(function(j){return{st:r.status,j:j}})})
+    .then(function(x){
+      syncing=false;
+      if(x.st===404){roomGone();return}
+      if(x.j&&x.j.s){setConn('ok');onSnap(x.j.s)}
+    }).catch(function(){syncing=false;setConn(navigator.onLine===false?'off':'wait')});
+}
+function startPoll(){if(!pollT)pollT=setInterval(resync,1500)}
+function stopPoll(){if(pollT){clearInterval(pollT);pollT=null}}
+function connect(){
+  if(es){try{es.close()}catch(e){}es=null}
+  if(!sess)return;
+  var my=es=new EventSource('/api/stream?code='+sess.code+'&token='+sess.token);
+  var alive=function(){if(es!==my)return false;failN=0;lastSse=Date.now();stopPoll();setConn('ok');return true};
+  my.onopen=alive;
+  my.onmessage=function(e){if(alive())onSnap(JSON.parse(e.data))};
+  my.addEventListener('hb',function(e){
+    if(!alive())return;
+    try{var d=JSON.parse(e.data);if(d.seq!=null&&d.seq>seq)resync()}catch(x){}
+  });
+  my.addEventListener('removed',function(){
+    if(es!==my)return;
+    my.close();es=null;stopPoll();sess=null;save('sk_sess',null);snap=null;seq=-1;closeModal();toast('You were removed from the table');render();
+  });
+  my.onerror=function(){
+    if(es!==my)return;
+    failN++;setConn(navigator.onLine===false?'off':'wait');
+    if(my.readyState===2){es=null;resync()}
+    if(failN>=3)startPoll();
+  };
+}
+// the server sends a heartbeat every 10 s; silence for 25 s means the stream is dead
+setInterval(function(){
+  if(!sess||isLocal||!snap)return;
+  if(Date.now()-lastSse>25000){
+    setConn(navigator.onLine===false?'off':'wait');startPoll();
+    if(Date.now()-lastTry>10000){lastTry=Date.now();connect();resync()}
+  }
+},4000);
+function wake(){
+  if(!sess||isLocal)return;
+  resync();
+  if(!es||es.readyState!==1||Date.now()-lastSse>15000)connect();
+}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)wake()});
+window.addEventListener('online',function(){setConn('wait');wake()});
+window.addEventListener('offline',function(){setConn('off')});
+window.addEventListener('pageshow',function(e){if(e.persisted)wake()});
+function act(a){
+  if(isLocal){var r=game.act(me,a);if(r&&r.err)toast(r.err);return}
+  var mine=sess;
+  api('/api/act',{code:sess.code,token:sess.token,a:a}).then(function(r){
+    if(r&&r.err){
+      if(r.err==='Not your turn'||r.err==='Not now'){resync();return}
+      toast(r.err);return
+    }
+    if(sess!==mine)return;
+    if(r&&r.s){onSnap(r.s);if(modal==='menu')openModal('menu')}
+  }).catch(function(){toast('Connection problem');setTimeout(resync,800)});
+}
+function enter(r){sess={code:r.code,token:r.token};save('sk_sess',sess);me=r.pid;seq=-1;connect()}
+function readHome(){var n=$('#nm'),c=$('#rc');if(n)hName=n.value;if(c)hCode=c.value.toUpperCase().replace(/[^A-Z]/g,'')}
+function create(){
+  readHome();var n=hName.trim();
+  if(!n){errMsg='Enter your name to continue';render();return}
+  save('sk_name',n);
+  if(DEMO){startDemo(n);return}
+  if(busy)return;busy=true;
+  api('/api/create',{name:n}).then(function(r){busy=false;if(r.err){errMsg=r.err;render();return}errMsg='';enter(r)}).catch(function(){busy=false;errMsg='Could not reach the server';render()});
+}
+function join(){
+  readHome();var n=hName.trim(),c=hCode.trim().toUpperCase();
+  if(!n){errMsg='Enter your name to continue';render();return}
+  if(!c){errMsg='Enter a room code to join';render();return}
+  save('sk_name',n);
+  if(DEMO){errMsg='The demo has no live tables. Use Start a table.';render();return}
+  if(busy)return;busy=true;
+  api('/api/join',{code:c,name:n}).then(function(r){busy=false;if(r.err){errMsg=r.err;render();return}errMsg='';enter(r)}).catch(function(){busy=false;errMsg='Could not reach the server';render()});
+}
+/* demo: the whole game runs in this page against bots */
+function startDemo(n){
+  isLocal=true;game=new E.Game('DEMO');game.autoMs=700;
+  var r=game.addHuman(n,'demo');me=r.pid;
+  game.onChange=function(){
+    game.humans().forEach(function(p){p.connected=true});
+    game.schedule();
+    onSnap(game.snapshot(me));
+  };
+  game.onChange();
+}
+function leave(){
+  if(DEMO){location.reload();return}
+  if(isLocal){game.destroy();game=null;isLocal=false}
+  else{act({type:'leave'});if(es){es.close();es=null}stopPoll();sess=null;seq=-1;save('sk_sess',null)}
+  snap=null;selPid=selCard=null;closeModal();render();
+}
+function tryRejoin(){
+  if(!sess)return;
+  api('/api/rejoin',sess).then(function(r){if(r.err){sess=null;save('sk_sess',null);render();return}me=r.pid;connect()}).catch(function(){});
+}
+
+/* ---------- helpers ---------- */
+function pl(id){return snap.players.filter(function(p){return p.id===id})[0]}
+function nm(id){var p=pl(id);return p?p.name:'?'}
+function amHost(){return snap&&snap.host===snap.me}
+function me_(){return pl(snap.me)}
+function pc(party){return party==='D'?'d':'r'}
+function PN(party){return E.PARTY[party]}
+function PS(party){return E.PARTIES[party]}
+function aliveN(s){return s.players.filter(function(p){return p.alive}).length}
+function lastChatId(){return snap&&snap.chat&&snap.chat.length?snap.chat[snap.chat.length-1].id:0}
+function unread(){return snap?snap.chat.filter(function(c){return c.id>chatSeen&&!c.sys&&c.pid!==snap.me}).length:0}
+
+/* ---------- shared pieces ---------- */
+function chyHTML(s){
+  var t=s&&s.phase==='reveal'?'<span class="rd bs">The Reveal</span>':s&&s.phase!=='lobby'?'<span class="rd bs">Round '+s.round+'</span>':'<span class="rd bs">Table open</span>';
+  return '<header class="chy bs"><div class="live">Live</div><h1>Secret Kale</h1>'+t+'<span class="cd '+conn+'" id="cd" role="img" aria-label="Connection"></span></header>';
+}
+function utilHTML(s){
+  var u=unread();
+  return '<nav class="util">'+
+    (s.phase!=='lobby'&&s.phase!=='reveal'?'<button data-a="m" data-v="role">Role</button><button data-a="m" data-v="rec">Record</button>':'<button data-a="m" data-v="rules">Rules</button>')+
+    '<button data-a="m" data-v="chat">Chat'+(u?'<b>'+u+'</b>':'')+'</button><button data-a="m" data-v="menu">Menu</button></nav>';
+}
+
+/* ---------- home ---------- */
+function homeHTML(){
+  return '<header class="chy bs"><div class="live">Live</div><div class="hh">New game</div><span class="rd bs">Table open</span></header>'+
+  '<main class="main">'+
+    '<h1 class="ttl bs"><span>Secret</span><b>Kale</b></h1><div class="rule"></div>'+
+    '<div class="tote bs"><div class="d">Democrats</div><i>?</i><div class="r">Republicans</div></div>'+
+    '<div class="say bs">One team is hiding. Find them.</div>'+
+    '<label class="fld"><small>Your name</small><input id="nm" maxlength="16" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="Type it here" value="'+esc(hName)+'"></label>'+
+    '<div class="err" role="alert">'+esc(errMsg)+'</div>'+
+    '<button class="go" data-a="create"'+(busy?' disabled':'')+'>Start a table</button>'+
+    '<div class="jrow"><label class="fld"><small>Room code</small><input id="rc" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" value="'+esc(hCode)+'"></label><button class="gh" data-a="join"'+(busy?' disabled':'')+'>Join</button></div>'+
+    '<div class="ver"><span>5–10 players · bots fill empty seats</span><span>'+VER+'</span></div>'+
+  '</main>';
+}
+
+/* ---------- lobby ---------- */
+function lobbyHTML(s){
+  var host=amHost(),humans=s.players.filter(function(p){return !p.bot});
+  var rows=s.players.map(function(p,i){
+    var tg=[];
+    if(p.id===s.host)tg.push('<span class="t g">Host</span>');
+    if(p.id===s.me)tg.push('<span class="t">You</span>');
+    if(!p.connected)tg.push('<span class="t m">Away</span>');
+    tg.push(tallyTag(p));
+    var rm=host&&p.id!==s.me?'<span class="st"><button class="chip" style="min-height:36px;padding:0 10px;font-size:.8rem" data-a="kick" data-v="'+p.id+'" aria-label="Remove '+esc(p.name)+'">Remove</button></span>':'';
+    return '<li><div class="rw'+(p.id===s.me?' me':'')+'"><span class="sn">'+(i+1)+'</span><span class="nm">'+esc(p.name)+'</span><span class="tgs">'+tg.join('')+'</span>'+rm+'</div></li>';
+  }).join('');
+  var empty=Math.max(0,s.n-humans.length);
+  var botRow=s.botsOn&&empty?'<li><div class="rw"><span class="sn">+</span><span class="nm" style="color:var(--mute)">'+plural(empty,'bot')+' will fill the empty seats</span></div></li>':'';
+  var settings='';
+  if(host){
+    settings='<div class="set"><div><div class="sec">Seats</div><div class="step"><button class="chip" data-a="size" data-v="-1" aria-label="Fewer seats">'+IC_MINUS+'</button><b class="bs">'+s.size+'</b><button class="chip" data-a="size" data-v="1" aria-label="More seats">'+IC_PLUS+'</button></div></div>'+
+      '<div><div class="sec">Bots fill empty seats</div><div class="chips"><button class="chip'+(s.botsOn?' on':'')+'" data-a="bots" data-v="1">On</button><button class="chip'+(!s.botsOn?' on':'')+'" data-a="bots" data-v="0">Off</button></div></div>'+
+      (s.botsOn?'<div><div class="sec">Bot level</div><div class="chips">'+LEVELS.map(function(l){return '<button class="chip'+(s.botLevel===l[0]?' on':'')+'" data-a="level" data-v="'+l[0]+'">'+l[1]+'</button>'}).join('')+'</div></div>':'')+
+      '<div><div class="sec">Turn timer</div><div class="chips">'+TIMERS.map(function(t){return '<button class="chip'+(s.timerSec===t?' on':'')+'" data-a="timer" data-v="'+t+'">'+timerLabel(t)+'</button>'}).join('')+'</div></div></div>';
+  }else{
+    settings='<p class="note">'+(s.botsOn?s.size+' seats, bots fill the empty ones':'Humans only')+' · timer '+timerLabel(s.timerSec).toLowerCase()+'. The host starts the game.</p>';
+  }
+  var total=s.botsOn?Math.max(s.size,humans.length):humans.length;
+  var can=total>=5;
+  var dock='<div class="dock">'+(host?'<button class="go" data-a="start"'+(can?'':' disabled')+'>Start the game</button><div class="note">'+(can?total+' players. Roles are dealt in secret.':'Need 5 players. Turn bots on to fill seats.')+'</div>':'<div class="note">Waiting for the host to start…</div>')+'</div>';
+  return chyHTML(s)+utilHTML(s)+'<main class="main">'+
+    '<div class="room"><div class="code bs">'+esc(s.code)+'</div><p>Room code. Friends join with it, or with the invite link.</p><button class="gh" data-a="copy">Copy invite link</button></div>'+
+    '<div><div class="sec">Players · '+humans.length+' here</div><ul class="tbl">'+rows+botRow+'</ul></div>'+settings+
+    '<button class="link" data-a="leave" style="align-self:center">Leave table</button></main>'+dock;
+}
+
+/* ---------- table ---------- */
+function raceHTML(s,party){
+  var slots=s.slots[party],got=s.enacted[party],hidden=party===s.minParty,segs='';
+  for(var i=0;i<slots;i++){
+    var f=i<got,nw=f&&s.enactedLast&&s.enactedLast.party===party&&i===got-1&&fresh('en'+s.round);
+    var lab='';
+    if(i===slots-1)lab='Win';
+    else if(hidden){var pw=s.powers[i];lab=pw?POW[pw]:'';if(i===4)lab=(lab?lab:'')+' +Veto'}
+    segs+='<div class="sg"><i class="'+(f?'f':'')+(nw?' new':'')+'"'+(nw?' style="animation-delay:'+fdel('en'+s.round,.1)+'"':'')+'>'+(f?party:'')+'</i><span>'+lab+'</span></div>';
+  }
+  return '<div class="race '+pc(party)+'"><div class="h bs"><span>'+PS(party)+(hidden?'<small>Hidden team</small>':'')+'</span><b>'+got+' / '+slots+'</b></div><div class="segs">'+segs+'</div></div>';
+}
+function boardHTML(s){
+  var lamps='';for(var i=0;i<3;i++)lamps+='<s class="'+(i<s.tracker?'f':'')+'"></s>';
+  return '<section class="board" aria-label="Bills enacted">'+raceHTML(s,'D')+raceHTML(s,'R')+
+    '<div class="trk bs"><div class="l"><span>Election tracker</span><span class="lamps">'+lamps+'</span></div><div class="r2"><b>'+s.tracker+' / 3</b><em>'+(s.vetoUnlocked?'Veto open · ':'')+'Pile '+s.deckN+'</em></div></div></section>';
+}
+function billsHTML(cards,o){
+  o=o||{};
+  return '<div class="bills">'+cards.map(function(c,i){
+    var sel=o.pick&&selCard===i,inner='<b>'+c+'</b><span>'+PN(c)+'</span>'+(sel?'<i>'+o.verb+'</i>':'');
+    return o.pick?'<button class="bill '+pc(c)+(sel?' sel':'')+'" data-a="card" data-v="'+i+'" aria-pressed="'+sel+'" aria-label="'+PN(c)+' bill">'+inner+'</button>':'<div class="bill '+pc(c)+'" role="img" aria-label="'+PN(c)+' bill">'+inner+'</div>';
+  }).join('')+'</div>';
+}
+function callHTML(s){
+  var me=s.me,isP=s.pres===me,isS=s.spk===me,cls='',lb='',big='',sub='',fig='',extra='';
+  var pn=s.pres?nm(s.pres):'',sn=s.spk?nm(s.spk):'';
+  var mine=false;
+  switch(s.phase){
+    case 'nominate':
+      lb='Nomination';mine=isP;
+      big=isP?'Pick a Speaker':esc(pn)+' is choosing';
+      sub=isP?'Tap an eligible player below, then Nominate.':'President '+esc(pn)+' nominates a Speaker, then everyone votes.';
+      break;
+    case 'vote':{
+      var inN=s.players.filter(function(p){return p.alive&&p.voted}).length;
+      lb='Speaker · call pending';mine=pl(me).alive&&s.myVote===null;
+      big=esc(sn)+' for Speaker';sub='Nominated by President '+esc(pn)+(pl(me).alive?'':'. You are out; watch the vote.');
+      fig=inN+' / '+aliveN(s)+'<small>Votes in</small>';
+      break;}
+    case 'voteresult':{
+      var v=s.vote;lb='The call';mine=true;
+      big='<span class="'+(fresh('vr'+s.round)?'stamp':'')+'" style="display:inline-block;animation-delay:'+fdel('vr'+s.round)+'">'+(v.passed?'Elected':'Voted down')+'</span>';
+      sub=esc(sn)+' for Speaker: Yea '+v.yes.length+' · Nay '+v.no.length+(v.passed?'':'. Tracker '+s.tracker+' of 3.')+(v.cleared?' '+esc(sn)+' is not the Kingpin.':'');
+      break;}
+    case 'legis_pres':
+      lb='Legislative session';mine=isP;
+      if(isP){big='Discard one';sub='The other two go to '+esc(sn)+'. Tap the bill you want gone.';extra=billsHTML(s.hand,{pick:true,verb:'Discard'})}
+      else{big='Reading bills';sub='President '+esc(pn)+' holds three bills and will pass two to '+esc(sn)+'.'}
+      break;
+    case 'legis_spk':
+      lb='Legislative session';mine=isS;
+      if(isS){big='Enact one';sub='From '+esc(pn)+'. The other is discarded.'+(s.canVeto?' You may ask for a veto instead.':'');extra=billsHTML(s.hand,{pick:true,verb:'Enact'})}
+      else{big=esc(sn)+' decides';sub=esc(sn)+' holds two bills from '+esc(pn)+' and will enact one.'}
+      break;
+    case 'veto':
+      lb='Veto requested';mine=isP;
+      if(isP){big='Agree to veto?';sub=esc(sn)+' wants to discard both bills. If you agree, the election tracker moves up.';extra=billsHTML(s.hand)}
+      else{big='Veto asked';sub=esc(sn)+' asked to veto. President '+esc(pn)+' decides.'}
+      break;
+    case 'enacted':{
+      var el=s.enactedLast;cls=pc(el.party)==='d'?' pd':' pr';mine=true;
+      lb=el.chaos?'Enacted by chaos':'Bill enacted';
+      big='<span class="'+(fresh('en'+s.round)?'stamp':'')+'" style="display:inline-block;animation-delay:'+fdel('en'+s.round)+'">'+PN(el.party)+' bill enacted</span>';
+      sub=el.chaos?'Enacted by chaos: three failed votes, so the top bill goes through.':'Enacted by '+esc(nm(el.pres))+' and '+esc(nm(el.spk))+'.';
+      break;}
+    case 'power':{
+      lb='Presidential power';mine=isP;
+      var pw=s.power;
+      if(isP&&s.powerStage==='pick'){
+        big={inv:'Investigate',special:'Special election',exec:'Execute'}[pw];
+        sub={inv:'You will see one player’s party, nothing more. Only you see it.',special:'Choose the next President. The usual order resumes after you.',exec:'The player you pick is out of the game for good.'}[pw];
+      }else if(isP&&pw==='inv'){
+        var sc=s.secret,pt=sc.party;
+        cls=pc(pt)==='d'?' pd':' pr';big=esc(nm(sc.pid))+' is a '+PN(pt);sub='Only you can see this. You may say anything.';
+      }else if(isP&&pw==='peek'){big='Next three bills';sub='Only you can see this. They stay on top in this order.';extra=billsHTML(s.secret.cards)}
+      else{big=esc(pn)+' has a power';sub={inv:esc(pn)+' is investigating a player.',peek:esc(pn)+' is peeking at the next three bills.',special:esc(pn)+' is calling a special election.',exec:esc(pn)+' is choosing a player to execute.'}[pw]}
+      break;}
+    case 'gameover':{
+      var r=s.result;cls=pc(r.party)==='d'?' pd':' pr';mine=true;lb='Final call';
+      big='<span class="'+(fresh('go'+s.code+s.round)?'stamp':'')+'" style="display:inline-block;animation-delay:'+fdel('go'+s.code+s.round)+'">'+PS(r.party)+' win</span>';sub=esc(r.why)+'.';
+      break;}
+  }
+  if(!mine&&!cls)cls=' quiet';
+  return '<section class="call bs'+cls+'" aria-live="polite"><div class="big">'+big+'</div>'+(fig?'<div class="fig">'+fig+'</div>':'')+'<p style="font-family:var(--body);text-transform:none">'+sub+'</p>'+extra+'</section>';
+}
+function selectable(s){
+  if(s.phase==='nominate'&&s.pres===s.me)return s.eligible;
+  if(s.phase==='power'&&s.powerStage==='pick'&&s.pres===s.me)return s.targets;
+  return [];
+}
+function tableHTML(s){
+  var sel=selectable(s),over=s.phase==='gameover',idx=0;
+  var rows=s.players.map(function(p,i){
+    var tg=[],st='';
+    var isP=p.id===s.pres,isS=p.id===s.spk&&s.phase!=='nominate';
+    if(isP&&!over)tg.push('<span class="t g">President</span>');
+    if(isS&&!over)tg.push('<span class="t g">'+(s.phase==='vote'||s.phase==='voteresult'?'Nominee':'Speaker')+'</span>');
+    if(p.id===s.me)tg.push('<span class="t">You</span>');
+    if(p.role==='king')tg.push('<span class="t g">Kingpin</span>');
+    else if(p.role==='min'&&!over)tg.push('<span class="t '+pc(s.minParty)+'">Hidden team</span>');
+    if(p.limited&&(s.phase==='nominate'||s.phase==='vote'))tg.push('<span class="t m">Term limit</span>');
+    if(p.probed&&p.alive&&!over)tg.push('<span class="t m">Probed</span>');
+    if(p.cleared&&p.alive&&!over)tg.push('<span class="t m">Not the Kingpin</span>');
+    if(p.bot)tg.push('<span class="t m">Bot</span>');
+    if(!p.connected&&!p.bot)tg.push('<span class="t m">Away</span>');
+    if(over)tg.push(tallyTag(p));
+    if(!p.alive)st='Out';
+    else if(over)st=p.role==='king'?'Kingpin':PN(p.role==='maj'?s.majParty:s.minParty);
+    else if(s.phase==='vote')st=p.voted?'<span class="vc in">'+(p.id===s.me&&s.myVote!==null?'In · '+(s.myVote?'Yea':'Nay'):'In')+'</span>':'Waiting';
+    else if(s.phase==='voteresult'&&p.vote!==null)st='<span class="vc '+(p.vote?'y':'n')+(fresh('vr'+s.round)?' fresh':'')+'" style="animation-delay:'+fdel('vr'+s.round,.12*(idx++))+'">'+(p.vote?'Yea':'Nay')+'</span>';
+    else if(s.phase==='nominate'&&s.eligible.indexOf(p.id)>=0)st='Eligible';
+    var can=sel.indexOf(p.id)>=0;
+    var cls='rw'+(p.id===s.me?' me':'')+(!p.alive?' dead':'')+(can&&selPid===p.id?' sel':'');
+    var inner='<span class="sn">'+(i+1)+'</span><span class="nm">'+esc(p.name)+'</span><span class="tgs">'+tg.join('')+'</span><span class="st">'+st+'</span>';
+    return '<li>'+(can?'<button class="'+cls+'" data-a="pick" data-v="'+p.id+'" aria-pressed="'+(selPid===p.id)+'">'+inner+'</button>':'<div class="'+cls+'">'+inner+'</div>')+'</li>';
+  }).join('');
+  var head=s.phase==='vote'||s.phase==='voteresult'?'Vote':over?'Role':'';
+  return '<section><div class="hd"><span>Player</span><span>'+head+'</span></div><ul class="tbl">'+rows+'</ul></section>';
+}
+function statusLine(s){
+  var pn=s.pres?nm(s.pres):'',sn=s.spk?nm(s.spk):'';
+  switch(s.phase){
+    case 'reveal':return 'The Reveal: everyone looks at their role';
+    case 'nominate':return pn+' is choosing a Speaker';
+    case 'vote':return pn+' nominated '+sn+' · '+s.players.filter(function(p){return p.alive&&p.voted}).length+' of '+aliveN(s)+' votes in';
+    case 'voteresult':return 'Yea '+s.vote.yes.length+', Nay '+s.vote.no.length+': '+sn+(s.vote.passed?' is Speaker':' is voted down');
+    case 'legis_pres':return pn+' is reading three bills';
+    case 'legis_spk':return sn+' is choosing a bill';
+    case 'veto':return sn+' asked for a veto';
+    case 'enacted':return PN(s.enactedLast.party)+' bill enacted';
+    case 'power':return pn+' is using a '+(s.power==='inv'?'probe':s.power==='peek'?'peek':s.power==='special'?'special election':'execution');
+    case 'gameover':return s.result.why;
+  }
+  return '';
+}
+function dockHTML(s){
+  var me=s.me,isP=s.pres===me,isS=s.spk===me,mp=pl(me),b='',note='';
+  var tl='<span id="tl"></span>';
+  switch(s.phase){
+    case 'nominate':
+      if(isP){b='<button class="go" data-a="nominate"'+(selPid?'':' disabled')+'>'+(selPid?'Nominate '+esc(nm(selPid)):'Pick a player')+'</button>';note='Term-limited players cannot be nominated.'}
+      else note='Waiting for President '+esc(nm(s.pres))+'.';
+      break;
+    case 'vote':
+      if(mp.alive&&s.myVote===null)b='<div class="drow"><button class="go y" data-a="vote" data-v="1">Yea</button><button class="gh" data-a="vote" data-v="0">Nay</button></div>';
+      else if(mp.alive)note='Your vote is in: '+(s.myVote?'Yea':'Nay')+'. Votes show when everyone has voted.';
+      else note='You are out of the game. Watch the table.';
+      break;
+    case 'legis_pres':
+      if(isP){b='<button class="go" data-a="discard"'+(selCard!==null?'':' disabled')+'>'+(selCard!==null?'Discard this bill':'Tap a bill to discard')+'</button>'}
+      else note='President '+esc(nm(s.pres))+' is reading three bills.';
+      break;
+    case 'legis_spk':
+      if(isS){b='<button class="go" data-a="enact"'+(selCard!==null?'':' disabled')+'>'+(selCard!==null?'Enact this bill':'Tap a bill to enact')+'</button>'+(s.canVeto?'<button class="gh sm" data-a="veto">Ask for a veto</button>':'')}
+      else note=esc(nm(s.spk))+' is choosing a bill.';
+      break;
+    case 'veto':
+      if(isP)b='<div class="drow"><button class="go y" data-a="vetoans" data-v="1">Agree</button><button class="gh" data-a="vetoans" data-v="0">Refuse</button></div>';
+      else note='Waiting for the President to answer the veto.';
+      break;
+    case 'power':
+      if(isP&&s.powerStage==='pick'){
+        var verb={inv:'Investigate',special:'Call election for',exec:armed?'Tap again to execute':'Execute'}[s.power];
+        var lab=selPid?(s.power==='exec'&&armed?verb+' '+esc(nm(selPid)):verb+' '+esc(nm(selPid))):'Pick a player';
+        b='<button class="go'+(armed?' arm':'')+'" data-a="target"'+(selPid?'':' disabled')+'>'+lab+'</button>';
+      }else if(isP)b='<button class="go" data-a="ack">Got it</button>';
+      else note='President '+esc(nm(s.pres))+' is using a power.';
+      break;
+    case 'voteresult':case 'enacted':
+      note='Next step in a moment…';break;
+    case 'gameover':
+      b=amHost()?'<button class="go" data-a="again">Play again</button>':'';
+      note=amHost()?'Same table, new roles.':'Waiting for the host to start another game.';
+      break;
+  }
+  if(/^Waiting|is reading|is choosing|is using|Next step/.test(note))note='';
+  return '<div class="dock"><div class="tick"><b class="bs">Now</b><span>'+esc(statusLine(s))+'</span>'+tl+'</div>'+b+(note?'<div class="note">'+note+'</div>':'')+'</div>';
+}
+function gameHTML(s){
+  return chyHTML(s)+utilHTML(s)+'<main class="main'+(s.phase==='vote'||s.phase==='voteresult'?' cmp':'')+'">'+boardHTML(s)+callHTML(s)+tableHTML(s)+(s.phase==='gameover'?'<button class="link" data-a="leave" style="align-self:center">Leave table</button>':'')+'</main>'+dockHTML(s);
+}
+function render(){
+  var app=$('#app');
+  if(!snap){app.innerHTML=homeHTML();return}
+  app.innerHTML=snap.phase==='lobby'?lobbyHTML(snap):snap.phase==='reveal'?revealHTML(snap):gameHTML(snap);
+  paintConn();paintTimer();
+  if((snap.phase==='vote'||snap.phase==='voteresult')&&!modal&&!scrolled[snap.phase+snap.round]){
+    scrolled[snap.phase+snap.round]=1;var c=$('.call');if(c)c.scrollIntoView({block:'start'});
+  }
+}
+function paintTimer(){
+  var el=$('#tl');if(!el)return;
+  if(turnDeadline==null){el.textContent='';return}
+  var left=Math.max(0,Math.ceil((turnDeadline-Date.now())/1000));
+  el.textContent=' Time left '+Math.floor(left/60)+':'+('0'+left%60).slice(-2);
+}
+setInterval(paintTimer,500);
+
+/* ---------- sheets ---------- */
+function sheet(title,body){return '<div class="sheet" role="dialog" aria-label="'+esc(title)+'"><div class="sh"><h2 class="bs">'+esc(title)+'</h2><button class="x" data-a="close" aria-label="Close">'+IC_X+'</button></div>'+body+'</div>'}
+function roleBlock(s){
+  var r=s.myRole,party=s.myParty,hidden=!roleShow;
+  var title,txt,cls=pc(party),allies=s.players.filter(function(p){return p.role&&p.id!==s.me});
+  if(r==='maj'){title='You are a '+PN(party);txt='You are on the majority team. Enact 5 '+PN(party)+' bills, or catch the Kingpin, before the hidden team gets 6 '+PN(s.minParty)+' bills. You do not know anyone else’s role.'}
+  else if(r==='min'){title='You are a '+PN(party);txt='You are on the hidden team. Get 6 '+PN(party)+' bills enacted, or get the Kingpin elected Speaker after 3. Stay unseen.'}
+  else{title='You are the Kingpin';txt=s.n<=6?'You lead the hidden '+PS(party)+'. Your team knows you and you know them. After 3 '+PN(party)+' bills, get elected Speaker and you win. If you are executed, you lose.':'You lead the hidden '+PS(party)+'. Your team knows you, but you do not know them. After 3 '+PN(party)+' bills, get elected Speaker and you win. If you are executed, you lose.'}
+  var box=hidden?'<div class="rolebox hid bs">Role hidden</div>':'<div class="rolebox '+cls+'"><div class="big bs">'+esc(title)+'</div></div>';
+  var body=box+(hidden?'':'<p>'+esc(txt)+'</p>');
+  if(!hidden&&allies.length)body+='<div class="sec">Your team</div><ul class="tbl">'+allies.map(function(p){return '<li><div class="rw"><span class="nm">'+esc(p.name)+'</span><span class="tgs">'+(p.role==='king'?'<span class="t g">Kingpin</span>':'<span class="t '+pc(s.minParty)+'">Hidden team</span>')+'</span></div></li>'}).join('')+'</ul>';
+  if(!hidden&&s.myInv.length)body+='<div class="sec" style="margin-top:12px">Your investigations</div><ul class="tbl">'+s.myInv.map(function(i){return '<li><div class="rw"><span class="nm">'+esc(nm(i.pid))+'</span><span class="tgs"><span class="t '+pc(i.party)+'">'+PN(i.party)+'</span></span></div></li>'}).join('')+'</ul>';
+  return body;
+}
+function roleToggleHTML(){
+  return '<div class="drow" style="margin-top:14px"><button class="go'+(roleShow?' y':'')+'" data-a="roleToggle">'+(roleShow?'Hide it':'Show my role')+'</button></div><p class="note" style="margin-top:8px">Check that nobody is looking over your shoulder.</p>';
+}
+function roleHTML(s){return sheet('Your role',roleBlock(s)+roleToggleHTML())}
+function revealHTML(s){
+  var mp=pl(s.me),waiting=s.players.filter(function(p){return !p.ready}).length;
+  var rows=s.players.map(function(p,i){return '<li><div class="rw'+(p.id===s.me?' me':'')+'"><span class="sn">'+(i+1)+'</span><span class="nm">'+esc(p.name)+'</span><span class="tgs">'+(p.bot?'<span class="t m">Bot</span>':'')+'</span><span class="st">'+(p.ready?'<span class="vc in">Looked</span>':'Looking')+'</span></div></li>'}).join('');
+  var dock='<div class="dock"><div class="tick"><b class="bs">Now</b><span>'+(mp.ready?'Waiting for '+plural(waiting,'player')+' to look':'Look at your role, then tap the button')+'</span>'+'<span id="tl"></span></div>'+(mp.ready?'':'<button class="go" data-a="ready"'+(roleSeen?'':' disabled')+'>'+(roleSeen?'I’ve seen it':'Show your role first')+'</button>')+'</div>';
+  return chyHTML(s)+utilHTML(s)+'<main class="main"><h2 class="rvh bs">The Reveal</h2><p class="rvp">Night falls. Everyone looks at their secret role in private. The hidden team sees each other here, and nobody else learns anything.</p>'+(mp.ready?'<div class="rolebox hid bs">Role hidden</div>':roleBlock(s)+roleToggleHTML())+'<div><div class="sec">Who has looked</div><ul class="tbl">'+rows+'</ul></div></main>'+dock;
+}
+function cl(c){return '<span class="cl '+pc(c)+'">'+c+'</span>'}
+function recHTML(s){
+  var items=s.log.filter(function(e){return e.passed!==null||e.chaos||s.phase==='gameover'}).slice().reverse();
+  if(!items.length)return sheet('Record','<p>No votes yet.</p>');
+  var out=items.map(function(e){
+    var who=e.spk?esc(nm(e.pres))+' + '+esc(nm(e.spk)):esc(nm(e.pres));
+    var vote=e.passed===null?'Not voted':'Yea '+e.yes.length+' · Nay '+e.no.length+' · '+(e.passed?'Elected':'Voted down');
+    var names='';
+    if(e.passed!==null)names='<div class="m">Yea: '+(e.yes.map(function(i){return esc(nm(i))}).join(', ')||'none')+'<br>Nay: '+(e.no.map(function(i){return esc(nm(i))}).join(', ')||'none')+'</div>';
+    var ex=[];
+    if(e.enacted)ex.push(cl(e.enacted)+' '+PN(e.enacted)+' bill enacted'+(e.chaos?' by chaos':''));
+    if(e.veto)ex.push('Veto agreed');
+    if(e.power&&e.power.target!=null)ex.push(POWTXT[e.power.kind]+': '+esc(nm(e.power.target)));
+    else if(e.power)ex.push(POWTXT[e.power.kind]);
+    var cards='';
+    if(e.cards&&e.cards.drawn){
+      var c=e.cards;
+      cards='<div class="m">Drew '+c.drawn.map(cl).join('')+(c.discardP?' · discarded '+cl(c.discardP):'')+(c.passed?' · passed '+c.passed.map(cl).join(''):'')+(c.vetoed?' · vetoed':'')+(c.discardS?' · Speaker discarded '+cl(c.discardS):'')+(c.enacted?' and enacted '+cl(c.enacted):'')+'</div>';
+    }
+    return '<li class="en"><b class="n bs">#'+e.n+'</b>'+who+'<div>'+vote+'</div>'+names+(ex.length?'<div>'+ex.join(' · ')+'</div>':'')+cards+'</li>';
+  }).join('');
+  return sheet('Record','<ul style="padding:0;margin:0">'+out+'</ul>');
+}
+function chatHTML(){
+  return sheet('Table chat','<div class="chatl" id="chatl"></div><form class="cin" id="cf"><input id="ci" maxlength="160" autocomplete="off" placeholder="Say something" aria-label="Message"><button class="go" type="submit">Send</button></form>');
+}
+function paintChat(){
+  var l=$('#chatl');if(!l||!snap)return;
+  l.innerHTML=snap.chat.map(function(c){return c.sys?'<div class="cm sys">'+esc(c.text)+'</div>':'<div class="cm"><b>'+esc(c.name)+'</b> '+esc(c.text)+'</div>'}).join('')||'<div class="cm sys">Nothing yet.</div>';
+  l.scrollTop=l.scrollHeight;
+  chatSeen=lastChatId();
+}
+function menuHTML(s){
+  var host=amHost(),b='<div class="sec">Text size</div><div class="chips">'+FSIZES.map(function(f,i){return '<button class="chip'+(ui.fs===i?' on':'')+'" data-a="fs" data-v="'+i+'">'+f[0]+'</button>'}).join('')+'</div>';
+  var ww=s.players.filter(function(p){return !p.bot&&p.tally&&p.tally.games});
+  if(ww.length)b+='<div class="sec" style="margin-top:14px">Wins this sitting</div><ul class="tbl">'+ww.map(function(p){return '<li><div class="rw"><span class="nm">'+esc(p.name)+'</span><span class="tgs"></span><span class="st">'+p.tally.wins+' of '+plural(p.tally.games,'game')+'</span></div></li>'}).join('')+'</ul>';
+  b+='<div class="sec" style="margin-top:14px">Connection</div><p id="connst" class="note" style="text-align:left">'+esc(connText())+'</p>';
+  if(host){
+    b+='<div class="sec">Bot level</div><div class="chips">'+LEVELS.map(function(l){return '<button class="chip'+(s.botLevel===l[0]?' on':'')+'" data-a="level" data-v="'+l[0]+'">'+l[1]+'</button>'}).join('')+'</div>';
+    b+='<div class="sec" style="margin-top:14px">Turn timer</div><div class="chips">'+TIMERS.map(function(t){return '<button class="chip'+(s.timerSec===t?' on':'')+'" data-a="timer" data-v="'+t+'">'+timerLabel(t)+'</button>'}).join('')+'</div>';
+    var others=s.players.filter(function(p){return !p.bot&&p.id!==s.me});
+    if(others.length&&s.phase!=='lobby')b+='<div class="sec" style="margin-top:14px">Remove a player (a bot takes the seat)</div><div class="chips">'+others.map(function(p){return '<button class="chip" data-a="kick" data-v="'+p.id+'">'+esc(p.name)+'</button>'}).join('')+'</div>';
+  }
+  b+='<div class="chips" style="margin-top:16px"><button class="chip" data-a="m" data-v="rules">How to play</button><button class="chip" data-a="leave">Leave table</button></div><p class="note" style="margin-top:12px">'+VER+'</p>';
+  return sheet('Menu',b);
+}
+function rulesHTML(){
+  return sheet('How to play','<ul class="r">'+
+    '<li>The game opens with the Reveal: everyone looks at their secret role in private, and the vote waits until all have looked. The hidden team sees each other. At 5 or 6 players the Kingpin sees them too; at 7 or more the Kingpin does not.</li>'+
+    '<li>Each game one party hides a team. The hidden team needs 6 of its bills; the other party needs 5. Everyone holds a secret role, and the Kingpin is the hidden team’s leader.</li>'+
+    '<li>Each round the President nominates a Speaker. Everyone votes Yea or Nay, and votes show together. More Yea than Nay elects them; a tie fails. Three failed votes in a row enact the top bill by chaos.</li>'+
+    '<li>The President draws 3 bills, discards 1 and passes 2. The Speaker enacts 1. Talk is free and anyone may lie.</li>'+
+    '<li>The last elected President and Speaker cannot be nominated (with 5 players left, only the last Speaker).</li>'+
+    '<li>Hidden-team bills unlock powers for the President, shown under the bar: probe a player’s party, peek at the next 3 bills, call a special election, execute a player.</li>'+
+    '<li>After 5 hidden-team bills the Speaker may ask for a veto. The President must agree, and the tracker moves up.</li>'+
+    '<li>After 3 hidden-team bills, electing the Kingpin as Speaker wins for the hidden team. Executing the Kingpin wins for the other party. From then on, any elected Speaker who is not the Kingpin is marked as cleared.</li></ul>');
+}
+function openModal(kind,keep){
+  var s=snap,m=$('#modal');
+  if(!s&&kind!=='rules')return;
+  modal=kind;
+  var h=kind==='role'?roleHTML(s):kind==='rec'?recHTML(s):kind==='chat'?chatHTML():kind==='menu'?menuHTML(s):rulesHTML();
+  var st=keep&&m.firstElementChild?m.firstElementChild.scrollTop:0;
+  m.innerHTML=h;m.classList.add('on');
+  if(keep&&m.firstElementChild){m.firstElementChild.scrollTop=st;m.firstElementChild.style.animation='none'}
+  if(kind==='chat'){paintChat();var cf=$('#cf');cf.onsubmit=function(e){e.preventDefault();var i=$('#ci'),t=i.value.trim();if(!t)return;i.value='';act({type:'chat',text:t});i.focus()}}
+}
+function closeModal(){modal=null;var m=$('#modal');m.classList.remove('on');m.innerHTML='';if(snap)render()}
+$('#modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal)closeModal()});
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-a]');if(!el||el.disabled)return;
+  onAct(el);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!snap){var t=e.target;if(t&&t.id==='rc')join();else if(t&&t.id==='nm')create()}
+});
+function onAct(el){
+  var a=el.dataset.a,v=el.dataset.v,s=snap;
+  switch(a){
+    case 'create':create();break;
+    case 'join':join();break;
+    case 'start':act({type:'start'});break;
+    case 'leave':closeModal();leave();break;
+    case 'copy':{
+      var link=location.origin+location.pathname+'?r='+s.code;
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(function(){toast('Invite link copied')},function(){toast(link)});
+      else toast(link);
+      break;}
+    case 'size':act({type:'size',size:s.size+parseInt(v,10)});break;
+    case 'bots':act({type:'bots',on:v==='1'});break;
+    case 'level':act({type:'level',level:v});break;
+    case 'timer':act({type:'timer',sec:parseInt(v,10)});break;
+    case 'fs':ui.fs=parseInt(v,10);applyUI();if(modal)openModal(modal,true);render();break;
+    case 'kick':act({type:'kick',pid:parseInt(v,10)});break;
+    case 'm':openModal(v);break;
+    case 'close':closeModal();break;
+    case 'roleToggle':roleShow=!roleShow;roleSeen=true;if(modal==='role')openModal('role',true);render();break;
+    case 'ready':roleShow=false;act({type:'ready'});break;
+    case 'pick':{var id=parseInt(v,10);selPid=selPid===id?null:id;armed=false;render();break;}
+    case 'card':{var i=parseInt(v,10);selCard=selCard===i?null:i;render();break;}
+    case 'nominate':if(selPid){var t=selPid;selPid=null;act({type:'nominate',pid:t})}break;
+    case 'vote':act({type:'vote',yes:v==='1'});break;
+    case 'discard':if(selCard!==null){var c=selCard;selCard=null;act({type:'pdiscard',i:c})}break;
+    case 'enact':if(selCard!==null){var c2=selCard;selCard=null;act({type:'senact',i:c2})}break;
+    case 'veto':act({type:'veto'});break;
+    case 'vetoans':act({type:'vetoans',yes:v==='1'});break;
+    case 'target':
+      if(!selPid)break;
+      if(s.power==='exec'&&!armed){armed=true;render();break}
+      var tp=selPid;selPid=null;armed=false;act({type:'target',pid:tp});break;
+    case 'ack':act({type:'ack'});break;
+    case 'again':act({type:'again'});break;
+  }
+}
+
+applyUI();
+render();
+if(sess&&!DEMO)tryRejoin();
+})();
+</script>
+</body>
+</html>
