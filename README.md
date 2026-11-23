@@ -5,7 +5,9 @@ v1 · Ishan Atul's render
 
 ## Run locally
     node server.js      # http://localhost:3000   (Node 18+, no dependencies)
-    npm test            # rule checks and simulated games (engine), then run test/server.test.js for a full game over HTTP
+    npm test            # rule checks and simulated games (engine)
+    node test/server.test.js   # a full game over HTTP and server-sent events with five human clients
+    node test/fuzz.js          # random illegal actions at games in every phase: nothing may throw
     node build.js       # writes dist/secret-kale-demo.html (whole app in one page, plays against bots)
 
 ## Deploy on Render (same as Judgement and Asshole)
@@ -43,7 +45,7 @@ Don't redeploy mid-game: live rooms are held in memory and drop on restart. The 
 - The tracker resets whenever a bill is enacted. The record shows every vote, and at the end every draw and discard.
 
 ## Settings
-Name, text size, host: seats (5 to 10), bots on/off, bot level (Easy, Medium, Hard), turn timer (Off, 30 s, 45 s, 1 min, 2 min), remove a player (a bot takes the seat mid-game).
+Name, color theme (Election night, Graphite, Kale, Plum, Ocean, Daylight), text size, host: seats (5 to 10), bots on/off, bot level (Easy, Medium, Hard), turn timer (Off, 30 s, 45 s, 1 min, 2 min), remove a player (a bot takes the seat mid-game).
 
 ## Notes
 - Name is required to create or join. Rejoin after a refresh is automatic on the same device. `/?r=CODE` prefills the room code.

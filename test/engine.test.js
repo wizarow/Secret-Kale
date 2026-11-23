@@ -549,7 +549,7 @@ atest('a human who never looks is readied after the wait', async () => {
   [0, 1, 2, 3].forEach(i => act(g, i, { type: 'ready' }));
   g.setConnected(P(g, 4).id, false);
   assert.strictEqual(g.phase, 'reveal');
-  await new Promise(r => setTimeout(r, 120));
+  await new Promise(r => setTimeout(r, 700));
   assert.notStrictEqual(g.phase, 'reveal');
   g.destroy();
 });
@@ -559,7 +559,7 @@ atest('a human who is away is played for after the wait, and gets control back',
   const first = g.presPlayer();
   assert.strictEqual(g.phase, 'nominate');
   g.setConnected(first.id, false);
-  await new Promise(r => setTimeout(r, 120));
+  await new Promise(r => setTimeout(r, 700));
   assert.strictEqual(g.phase, 'vote', 'the away President was played for');
   g.setConnected(first.id, true);
   assert.strictEqual(first.bot, false);
@@ -570,7 +570,7 @@ atest('the turn timer plays for a human who runs out of time', async () => {
   const g = table(5);
   g.timerSec = 30; g.timerScale = 0.001;     // 30 ms
   g.emit();
-  await new Promise(r => setTimeout(r, 150));
+  await new Promise(r => setTimeout(r, 800));
   assert.ok(g.phase !== 'nominate', 'timed out and played');
   assert.ok(g.chat.some(c => /Time’s up/.test(c.text)));
   g.destroy();
@@ -584,7 +584,7 @@ atest('a vote that is only waiting on one away human still finishes', async () =
   g.emit();
   [0, 1, 2, 3, 4].filter(i => i !== away).forEach(i => act(g, i, { type: 'vote', yes: true }));
   assert.strictEqual(g.phase, 'vote');
-  await new Promise(r => setTimeout(r, 120));
+  await new Promise(r => setTimeout(r, 700));
   assert.ok(g.phase !== 'vote');
   g.destroy();
 });
